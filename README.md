@@ -9,7 +9,7 @@ LICENSE
 
 COMPILE TOOLS
 ===============
-* 
+* Borland C++ 3.0
  
 AUTHORS
 ===============
