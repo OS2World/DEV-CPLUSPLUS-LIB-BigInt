@@ -1,0 +1,342 @@
+\StartChapter\
+*****************************\break\
+**                         **\break\
+** BINT - Big INTeger math **\break\
+**                         **\break\
+*****************************\break\
+\break\
+DESCRIPTION
+\push lm\\lm +5\
+
+\StartParagraph\
+Bint is a library of function to manipulate big integers.\StopParagraph\
+
+\StartParagraph\
+Why use a special library when we have longs, doubles or even
+long doubles? Because the built-in types in C has limits.
+I was planning to program a RSA en/de-cryption tool. To
+encrypt data it was needed to to raise a number to a power
+and the do a modulus division. Well, you could have done
+that with normal longs, you might say - No I could not! The
+RSA standard requires the power to be a 100-digit number
+and the divisor to be a 200-digit number! this was too much
+for even long doubles.\StopParagraph\
+
+\StartParagraph\
+So I began programming the BINT library.\StopParagraph\
+
+\StartParagraph\
+All the function in the library uses a "bint" type. The
+bint type is defined in bint.h and all the functions are in
+bint.c\StopParagraph\
+
+\StartParagraph\
+Why, you might ask, is the bint not a class. I made the
+decision to make bint a normal abstract data type due to
+the fact that not everybody have a C++ compiler.\StopParagraph\
+
+\StartParagraph\
+You can change the size of the bint type, you do this by
+changing the #define's BINT_xxxxxxx. Note that when you
+change the BINT_ELEMTYPE yu must change BINT_ELEM_BITS too.
+The type defined by BINT_ELEMTYPE can be all unsigned
+datatypes. By default the type is unsigned char and the
+number of element in a bint is 16. This gives the bint a size of 128 bits. The precision is
+approx. 38 digits (decimal) so if you need more can
+increase BINT_ELEMENTS or change BINT_ELEMTYPE to a bigger
+data type (note: the type must be unsigned).\StopParagraph\
+\pop lm\
+\break\
+DESCRIPTION OF FUNCTIONS\break\
+\push lm\\lm +5\
+\break\
+\StartParagraph\
+All the functions have been programmed to give optimum
+performance (as algorithms, -not code). This has been done
+using formal methods.The register keyword have not been used
+due to the fact that most modern C-compilers does this
+automatically.\StopParagraph\
+
+\StartParagraph\
+All the functions take pointers to bint as arguments.
+Most of the functions returns a pointer to the result (NULL
+if an error occurred). This makes it possible to make
+statements like this:\StopParagraph\
+\StartItem\
+     bint_inc(bint_mul(&a,bint_add(&b,&c)));\break\
+     /* equivalent to result=a*(b+c)+1;\StopItem\
+
+Overflow (and underflow) is not detected;\break\
+\break\
+
+Each function is described by:\break\
+\push lm\\lm +3\
+Prototype:\break\
+\StartItem\eg. bint *bint_inc(bit *result);\Stop1lItem\
+Pre:\break\
+\StartItem\Any preconditions\Stop1lItem\
+Post:\break\
+\StartItem\Postcondition (what the function establishes)\Stop1lItem\
+Time complexity:\break\
+\StartItem\Abstract time use:\break\
+\StartItem\O(1)        constant time use\Stop1lItem\
+\StartItem\O(a)        time use is propotional with a\Stop1lItem\
+\StartItem\O(log(a))   time use is propotional with log(a)\Stop1lItem\
+\StartItem\O(a*log(b)) time use is propotional with a*log(b)\Stop1lItem\
+\StopItem\
+A description\break\
+\pop lm\
+\EndChapter\
+
+\StartChapter\
+Prototype:bint *uint_to_bint(unsigned int a,bint *result);\break\
+Pre:none\break\
+Post:result=a\break\
+Time complexity:O(1)\break\
+Converts an unsigned int to a bint. returns a pointer to result\break\
+\break\
+\break\
+Prototype:bint *long_to_bint(long a,bint *result);\break\
+Pre:none\break\
+Post:result=a\break\
+Time complexity:O(1)\break\
+Converts a long to a bint. returns a pointer to result\break\
+\break\
+\break\
+Prototype:bint *double_to_bint(double a,bint *result);\break\
+Pre:none\break\
+Post:result=a\break\
+Time complexity:(1)\break\
+Converts a double to a bint. returns a pointer to result. If you call this\break\
+function with a negative double you get funny results!\break\
+\break\
+\break\
+Prototype:unsigned int bint_to_uint(bint *a);\break\
+Pre:none\break\
+Post:returns bint as int\break\
+Time complexity:O(1)\break\
+returns bint converted to a int. Overflow is not detected.\break\
+\break\
+\break\
+Prototype:long bint_to_long(bint *a);\break\
+Pre:none\break\
+Post:returns bint as long\break\
+Time complexity:O(1)\break\
+returns bint converted to a long. Overflow is not detected.\break\
+\break\
+\break\
+Prototype:double bint_to_double(bint *a);\break\
+Pre:none\break\
+Post:returns bint as double\break\
+Time complexity:O(1)\break\
+returns bint converted to a double. Overflow is not detected. It is possible\break\
+to detect this by a matherr()\break\
+\break\
+\break\
+Prototype:bint *bint_inc(bint *result);\break\
+Pre:none\break\
+Post:result'=result+1\break\
+Time complexity:O(1)\break\
+Increases result by 1. Is equivalent to the C operator ++. No overflow detect\break\
+\break\
+\break\
+Prototype:bint *bint_dec(bint *result);\break\
+Pre:none\break\
+Post:result'=result-1\break\
+Time complexity:O(1)\break\
+Decreases result by 1. Is equivalent to the C operator ++. No overflow detect\break\
+\break\
+\break\
+Prototype:bint *bint_complement1(bint *a,bint *result);\break\
+Pre:none\break\
+Post:result= 1-complement of a\break\
+Time complexity:O(1)\break\
+Computes the 1-complement of a. A 1-complement is a number with all the bits
+toggled. Used for subtraction.\break\
+\break\
+\break\
+Prototype:bint *bint_complement2(bint *a,bint *result);\break\
+Pre:none\break\
+Post:result= 2-complement of a\break\
+Time complexity:O(1)\break\
+Computes the 2-complement of a. A 2-complement is a 1-complement plus 1\break\
+\break\
+\break\
+Prototype:bint *bint_add(bint *a,bint *b,bint *result);\break\
+Pre:none\break\
+Post:result= a+b\break\
+Time complexity:O(1)\break\
+Adds a and b giving result\break\
+\break\
+\break\
+Prototype:bint *bint_sub(bint *a,bint *b,bint *result);\break\
+Pre:none\break\
+Post:result= a-b\break\
+Time complexity:O(1)\break\
+Substracts b from a giving result\break\
+\break\
+\break\
+Prototype:bint *bint_div2(bint *a,bint *result);\break\
+Pre:none\break\
+Post:result= a/2\break\
+Time complexity:O(1)\break\
+Divides a by 2 giving result. Equivalent to a right-shift\break\
+\break\
+\break\
+Prototype:bint *bint_mod2(bint *a,bint *result);\break\
+Pre:none\break\
+Post:result = a mod 2\break\
+Time complexity:O(1)\break\
+returns the remainder when a is divided by 2\break\
+\break\
+\break\
+Prototype:bint *bint_mul2(bint *a,bint *result);\break\
+Pre:none\break\
+Post:result= a*2\break\
+Time complexity:O(1)\break\
+Multiplies a with 2 giving result. Equivalent to a left-shift.\break\
+\break\
+\break\
+Prototype:int bint_is_zero(bint *a);\break\
+Pre:none\break\
+Post: return wether or not a is zero\break\
+Time complexity:O(1);\break\
+\break\
+Prototype:int bint_cmp(bint *a,bint *b);\break\
+Pre:none\break\
+Post:returns a<b -> -1\break\
+             a=b ->  0\break\
+             a>b ->  1\break\
+Time complexity:O(1)\break\
+Compares a with b returning the result of the comparision. Works just like
+strcmp() and is therefore compatible with qsort()\break\
+\break\
+\break\
+Prototype:void bint_divmod(bint *A,bint *B,bint *result1,bint *result2);\break\
+Pre:B<>0\break\
+Post:result1*B+result2=A\break\
+Time complexity:O(log(B))\break\
+Divides A with B giving the quotient in result1 and the remainder in result2\break\
+\break\
+\break\
+Prototype:bint *bint_div(bint *a,bint *b,bint *result);\break\
+Pre:b<>0\break\
+Post:result=a/b\break\
+Time complexity:O(log(b))\break\
+Divides a with b returning the quotient in result\break\
+\break\
+\break\
+Prototype:bint *bint_mod(bint *a,bint *b,bint *result);\break\
+Pre:b<>0\break\
+Post:result= a mod b\break\
+Time complexity:O(log(b))\break\
+Divides a with b returning the remander in result\break\
+\break\
+\break\
+Prototype:bint *bint_mul(bint *a,bint *b,bint *result);\break\
+Pre:none\break\
+Post:result= a*b\break\
+Time complexity:O(log(b))\break\
+Multiplies a with b giving result\break\
+\break\
+\break\
+Prototype:bint *bint_and(bint *a,bint *b,bint *result);\break\
+Pre:none\break\
+Post:result= a&b\break\
+Time complexity:O(1)\break\
+Performs a bit-wise AND on a and b giving result\break\
+\break\
+\break\
+Prototype:bint *bint_or(bint *a,bint *b,bint *result);\break\
+Pre:none\break\
+Post:result= a&b\break\
+Time complexity:O(1)\break\
+Performs a bit-wise AND on a and b giving result\break\
+\break\
+\break\
+Prototype:bint *bint_xor(bint *a,bint *b,bint *result);\break\
+Pre:none\break\
+Post:result= a|b\break\
+Time complexity:O(1)\break\
+Performs a bit-wise AND on a and b giving result\break\
+\break\
+\break\
+Prototype:bint *bint_setbit(bint *a,int bitno);\break\
+Pre:none\break\
+Post:bit (bitno) is set in a\break\
+Time complexity:O(1)\break\
+Sets the bitno'th bit in a. Ignores bitno's below 0 and above
+BINT_ELEMENTS*BINT_ELEM_BITS\break\
+\break\
+\break\
+Prototype:bint *bint_resetbit(bint *a,int bitno);\break\
+Pre:none\break\
+Post:bit (bitno) is reset in a\break\
+Time complexity:O(1)\break\
+Resets the bitno'th bit in a. Ignores bitno's below 0 and above
+BINT_ELEMENTS*BINT_ELEM_BITS\break\
+\break\
+\break\
+Prototype:int bint_getbit(bint *a,int bitno);\break\
+Pre:none\break\
+Post:returns the bitno'th bit in a\break\
+Time complexity:O(1)\break\
+Returns the bitno'th bit in a. Returns 0 when bitno is below 0 or above
+BINT_ELEMENTS*BINT_ELEM_BITS\break\
+\break\
+\break\
+Prototype:char *bint_to_string(bint *a,char *s);\break\
+Pre:none\break\
+Post:\break\
+Time complexity:O(log10(a))\break\
+Writes a decimal representation of a in the string s. s should be at least
+BINT_ELEMENTS*BINT_ELEM_BITS/ln(10)/ln(2) +1 to avoid writing out of the
+allocated space. For BINT_ELEMENTS=16 and BINT_ELEM_BITS=8. Total bits is 128
+128/ln(10)/ln(2) = 128/3 = approx. 38 bytes\break\
+\break\
+\break\
+Prototype:bint *bint_gcd(bint *a,bint *b,bint *result);\break\
+Pre:(a<>0 & b<>0)\break\
+Post:result= greatest common divisor of a and b\break\
+Time complexity:worst-case is ((a/b) max (b/a))\break\
+Returns the gratest common divisor of a and b.\break\
+ie:\push lm\\lm +3\ 7 gcd 9   = 1\break\
+    9 gcd 15  = 3\break\
+    12 gcd 24 = 12\break\
+    0 gcd 29  = 0!!!\break\
+    12 gcd 12 = 12\break\
+\pop lm\
+\break\
+\break\
+\break\
+Prototype:bint *bint_log2(bint *a,bint *result);\break\
+Pre:none\break\
+Post:2^result >=a\break\
+Time complexity:O(1)\break\
+Returns the 2-logarithm of a rounded up\break\
+\break\
+\break\
+Prototype:bint *bint_sqrt(bint *a,bint *result);\break\
+Pre:none\break\
+Post:result*result<=a & (result+1)*(result+1)>a\break\
+Time complexity:O(log(a))\break\
+Returns the square root of a rounded down.\break\
+\break\
+\break\
+Prototype:bint *bint_pow(bint *a,bint *b,bint *result);\break\
+Pre:none\break\
+Post:result= a^b\break\
+Time complexity:O(log(b))\break\
+Raises a to the power of b giving result\break\
+\break\
+\break\
+Prototype:bint *bint_powmod(bint *a,bint *b,bint *c,bint *result);\break\
+Pre:c<>0\break\
+Post:result= a^b mod c\break\
+Time complexity:I dont know!\break\
+Raises a to the power of b, divides the result by c and returns the
+remainder in result.
+This is actually the en-/decryption in the RSA method.\break\
+\EndChapter\
+
+

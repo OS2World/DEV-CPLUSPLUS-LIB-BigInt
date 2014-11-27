@@ -1,0 +1,154 @@
+Documentation for BigInt class
+Version: 1.0
+Release: basic, not optimized
+Date   : 24-03-93
+
+
+BigInt is public domain.
+
+Short description: BigInt provides larger integers for the C++ programmer. The
+		   bit width can range from 8 to <unlimited>. The library
+		   includes C++ source and a few example programs.
+
+
+CONTENTS:
+1 Purpose of bigint
+2 Short description of BigInt class
+3 Requirements
+4 Speed
+  4.1 Writing fast code
+  4.2 Machine-dependent speedups on BigInt class
+5 Example programs
+6 Files in this archive
+
+1  Purpose of BigInt
+
+The aim of BigInt is to provide an integer type to C++ with a larger data
+range than longs (usually 32 bits). The BigInt class provides you with any bit
+precision you need. A BigInt is at least 8 bits wide (actually the bit width of
+a char). There is no upper limit on the bit-precision. The BigInt class mimics
+the behavior of standard unsigned int/unsigned long. However, BigInts ar not as
+fast at the built-in types. The class will only work on machines which use two's
+complement.
+
+
+2  Short description of BigInt class
+This is the first part of the bigint.hpp file, where the class declaration is:
+ 1 const unsigned bigint_unitbits=     32;       //bits per unit
+ 2 const unsigned long bigint_unitmax= 4294967295UL;
+ 3 const unsigned bigint_unitprecis  =  2;       //units per BigInt
+ 4 const unsigned bigint_bitprecis=
+ 5                bigint_unitbits*bigint_unitprecis; //total bits in BigInt
+ 6 const unsigned bigint_bytes=bigint_unitbits/sizeof(unsigned long);
+ 7
+ 8 class BigInt {
+ 9      typedef unsigned long UnitType;
+10      UnitType	bits[bigint_unitprecis];
+
+Line 1-9 concerns the internal representation. When porting the class to
+another platform than i80x86 You should modify these lines as well. First you
+have to choose the larges built-in type which the processor (AND compiler) can
+handle in atomic operations. eg on i8088-i80286 it would be 16 bit (=int). If
+your program was to run on 80386 and above and your compiler is aware of that
+you could (should!) choose a 32-bits type (=long). The type MUST be unsigned.
+
+1: bigint_unitbits
+   This constant holds the number of bits there is in UnitType.
+2: bigint_unitmax
+   This constant holds the maximum numer for UnitType. That is, all bits set
+   to 1.
+3: bigint_unitprecis
+   This constant holds the number of UnitType per BigInt
+4: bigint_bitprecis
+   The total number of bits in a BigInt
+5: -
+6: bigint_bytes
+   The size of a BigInt in bytes. ONLY the size of the bits array, ei:
+   excluding any information the C++ compiler might add the the BigInt class.
+7: -
+8: class BigInt
+   This is the BigInt class
+9: typedef unsigned long UnitType;
+   UnitType is the built-in type you have chosen.
+10: bits[]
+    The bits array holds the value of a BigInt in little-endian order. If your
+    machine uses big endian you have to carefully examine the source for bigint
+    to ensure that bigint will still work.
+
+Note that BigInts generally is unsigned, however with care they can be treated
+as signed too. (beware of multiplication and division)
+
+
+3  Requirements
+A C++ compiler which accepts the C++ definition in Bjarne Stroustrups book:
+"The C++ Programming Language, 2nd edition". More precisily, it should accept
+postfix-operators (++,--). If it doesn't you will have to remove the
+postfix-operators.
+
+Your machine must use little-endian byte ordering, otherwise problems can
+arise.
+
+The bigint class was developed on an intel 80486 using Borland C++ 3.1
+generating 80386 code and '87 math code.
+
+
+4  Speed
+
+4.1 Writing fast code
+In general, you dont have to think of writing fast code, but there are a few
+rules:
+ - Use the ++ and -- operators whenever possible instead of addition and
+   subtraction. I think that ++++++x are faster than x+3, depending on the
+   number of units in bits[].
+ - Use x+=y,-=,*=,... instead of x=x+y. If you examine the source for BigInt
+   your will see that the '+' function simply delegates the work to bigint's
+   member operator '+='/'-='/...
+ - Use prefix increment/decrement instead of postfix. prefix is slightly faster
+   that postfix.
+ - If your code depends entirely on bigints you can call IsXXXX(),incr(),decr()
+   member functions.
+ - Note that the divmod() function exist.
+
+4.2 Machine-dependent speedups on BigInt class
+If you want to speed up the BigInt class your should do it in these areas
+(listed in order of importance)
+ - Constructors, especially the empty constructor and the int constructor. If
+   you choose a particular bits width it will be possible optimize them a lot,
+   even without using assembler!
+ - operator += and -= can be rewritten in assembler.
+ - operator >> and << can be rewritten in assembler. The timer.cpp example
+   program could gain as much as 5-10% speed by rewriting << and >> in
+   assembler. >> and << is the bottle-necks in the bigint system.
+ - comparison operators. If your machine offers reverse block comparison your
+   can gain a lot by rewriting the memcmprvs() function in assembler.
+What you should NOT optimize is:
+ - divmod(). Its time complexity is O(log(A/B)) which is the fastest possible,
+   and it only uses the member functions of BigInt.
+ - pow(). Same reason as above. Time complexity: O(log B)
+ - *=, Same reason as above.
+
+When programming an optimized version of bigint on a paricular machine, please
+name the optimized version '????????.spd', where '????????' is the machine name
+eg: 'i286', 'i386', 'm68000', 'm68040',...
+
+When distributing your optimized version, please include the original version
+and a note explaining that your optimized version is in '???????.spd'
+
+
+5  Example programs
+test.cpp  A program which tests your modifications of BigInt. Is tests almost
+          all operations. However, it can only be used for detmining when
+          BigInt does NOT work. If the programs says 'all ttests passed' it
+          just means that the test program could not locate any bugs!
+timer.cpp A program that you can use for profiling your optimizations
+prime.cpp An example program which just generates primes.
+
+
+6  Files in this archive
+bigint.hpp  Header file for Bigint
+bigint.cpp  Implementaion of bigint
+test.cpp    test program
+timer.cpp   profile program
+prime.cpp   example program
+bigint.doc  documentation
+
